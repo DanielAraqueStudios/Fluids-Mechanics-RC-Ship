@@ -1,0 +1,5 @@
+# ESP32 Boat Control GUI Requirements
+# Install with: pip install -r requirements.txt
+
+PyQt6>=6.6.0
+pyserial>=3.5
