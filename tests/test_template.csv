@@ -1,0 +1,12 @@
+timestamp,velocity_ms,current_A,voltage_V,position_m,command,pwm_value,notes
+0.000,0.00,0.00,12.0,0.00,PARAR,0,Start position
+1.234,0.15,0.45,11.9,0.15,ADELANTE,150,Initial acceleration
+2.456,0.35,0.60,11.8,0.50,ADELANTE,180,Steady state
+3.678,0.47,0.65,11.8,0.97,ADELANTE,200,Target velocity
+5.000,0.48,0.66,11.7,1.61,ADELANTE,200,
+7.500,0.47,0.65,11.7,2.79,ADELANTE,200,
+10.000,0.48,0.66,11.7,3.99,ADELANTE,200,Midpoint
+12.500,0.47,0.65,11.6,5.18,ADELANTE,200,
+15.000,0.48,0.66,11.6,6.38,ADELANTE,200,
+17.500,0.47,0.65,11.5,7.56,ADELANTE,200,
+20.000,0.00,0.00,11.5,8.00,PARAR,0,End of run
