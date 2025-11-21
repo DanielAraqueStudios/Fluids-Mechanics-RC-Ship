@@ -272,11 +272,11 @@ def print_summary(results: List[ResistanceComponents], hull: HullParameters):
 
 def main():
     parser = argparse.ArgumentParser(description='ITTC-1957 Resistance Calculator')
-    parser.add_argument('--length', type=float, default=0.45, help='Waterline length (m)')
-    parser.add_argument('--beam', type=float, default=0.20, help='Beam (m)')
+    parser.add_argument('--length', type=float, default=0.40, help='Waterline length (m)')
+    parser.add_argument('--beam', type=float, default=0.172, help='Beam (m)')
     parser.add_argument('--draft', type=float, default=0.055, help='Draft (m)')
-    parser.add_argument('--wetted_area', type=float, default=0.18, help='Wetted surface area (m²)')
-    parser.add_argument('--form_factor', type=float, default=0.2, help='Form factor k')
+    parser.add_argument('--wetted_area', type=float, default=0.1258, help='Wetted surface area (m²)')
+    parser.add_argument('--form_factor', type=float, default=0.25, help='Form factor k')
     parser.add_argument('--velocity', type=float, default=None, help='Single velocity to analyze (m/s)')
     parser.add_argument('--v_min', type=float, default=0.1, help='Minimum velocity for range (m/s)')
     parser.add_argument('--v_max', type=float, default=1.0, help='Maximum velocity for range (m/s)')

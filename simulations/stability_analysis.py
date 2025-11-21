@@ -18,12 +18,16 @@ from typing import Tuple
 
 @dataclass
 class HullGeometry:
-    """Hull dimensions and coefficients"""
-    length: float  # Waterline length (m)
+    """Hull dimensions and coefficients for hybrid bow-rectangular stern hull"""
+    length: float  # Total waterline length (m)
     beam: float    # Beam at waterline (m)
     draft: float   # Draft at design condition (m)
-    block_coeff: float = 0.85  # Block coefficient Cb
-    waterplane_coeff: float = 0.90  # Waterplane coefficient Cwp
+    height: float  # Total hull height/depth (m)
+    bow_length: float = 0.05  # Length of pyramidal bow section (m)
+    bow_base_width: float = 0.172  # Base width of bow pyramid (m)
+    stern_length: float = 0.40  # Length of rectangular stern section (m)
+    block_coeff: float = 0.70  # Block coefficient Cb (adjusted for hybrid shape)
+    waterplane_coeff: float = 0.88  # Waterplane coefficient Cwp (pentagonal deck)
     
 
 @dataclass
@@ -46,35 +50,87 @@ class StabilityCalculator:
         self.g = g      # Gravity (m/s²)
         
     def displacement_volume(self) -> float:
-        """Calculate displaced volume: ∇ = L × B × T × Cb"""
-        return (self.hull.length * self.hull.beam * 
-                self.hull.draft * self.hull.block_coeff)
+        """
+        Calculate displaced volume for hybrid hull:
+        Volume = Bow pyramid volume + Stern rectangular volume
+        
+        Bow: PIRÁMIDE con vértice A arriba (en el deck) y base rectangular E-F-C-B
+             NO hay punto D - el vértice A está en (0,0,H) y la base en x=bow_length
+        Stern: Prisma rectangular
+        """
+        # Bow volume: Pirámide = (1/3) × base_area × height
+        # Base rectangular en x=bow_length: width=beam, height=draft (sumergido)
+        # Altura de la pirámide = bow_length (5 cm)
+        bow_base_area = self.hull.bow_base_width * min(self.hull.draft, self.hull.height)
+        bow_volume = (1/3) * bow_base_area * self.hull.bow_length
+        
+        # Stern volume (rectangular prism): V = length × width × draft
+        stern_volume = self.hull.stern_length * self.hull.beam * self.hull.draft
+        
+        return bow_volume + stern_volume
     
     def displacement_mass(self) -> float:
         """Calculate displacement mass: Δ = ρ × ∇"""
         return self.rho * self.displacement_volume()
     
     def waterplane_area(self) -> float:
-        """Calculate waterplane area: Aw = L × B × Cwp"""
-        return self.hull.length * self.hull.beam * self.hull.waterplane_coeff
+        """
+        Calculate waterplane area for pentagonal deck:
+        Area = Bow triangle + Stern rectangle
+        """
+        # Bow triangle area: A = 0.5 × base × height
+        bow_triangle_height = 0.05  # 5 cm horizontal projection
+        bow_area = 0.5 * self.hull.bow_base_width * bow_triangle_height
+        
+        # Stern rectangle area: A = length × width
+        stern_area = self.hull.stern_length * self.hull.beam
+        
+        return bow_area + stern_area
     
     def center_of_buoyancy(self) -> float:
         """
-        Estimate KB (keel to center of buoyancy)
-        For rectangular barge: KB ≈ 0.5 × T
+        Calculate KB (keel to center of buoyancy) for hybrid hull
+        
+        Weighted average of bow pyramid and stern prism centroids
+        - Pyramid: centroid at 1/4 of height from base
+        - Rectangular prism: centroid at 1/2 of draft from keel
         """
-        return 0.5 * self.hull.draft
+        bow_base_area = self.hull.bow_base_width * min(self.hull.draft, self.hull.height)
+        bow_volume = (1/3) * bow_base_area * self.hull.bow_length
+        stern_volume = self.hull.stern_length * self.hull.beam * self.hull.draft
+        total_volume = bow_volume + stern_volume
+        
+        # Centroids from keel (vertical position)
+        bow_kb = 0.25 * min(self.hull.draft, self.hull.height)  # Pyramid centroid
+        stern_kb = 0.5 * self.hull.draft  # Rectangle centroid
+        
+        # Weighted average
+        if total_volume > 0:
+            kb = (bow_volume * bow_kb + stern_volume * stern_kb) / total_volume
+        else:
+            kb = 0.5 * self.hull.draft
+        return kb
     
     def metacentric_radius(self) -> float:
         """
-        Calculate BM (buoyancy to metacenter)
+        Calculate BM (buoyancy to metacenter) for pentagonal waterplane
         BM = I / ∇
-        where I = (L × B³) / 12 for rectangular waterplane
+        where I = second moment of area about longitudinal centerline
+        
+        For pentagonal deck (triangle + rectangle):
+        I_total = I_bow_triangle + I_stern_rectangle
         """
-        # Second moment of waterplane area about centerline
-        I = (self.hull.length * self.hull.beam**3) / 12
+        # Bow triangle: I ≈ (base × height³) / 36 for isosceles triangle
+        bow_triangle_height = 0.05
+        I_bow = (self.hull.bow_base_width * bow_triangle_height**3) / 36
+        
+        # Stern rectangle: I = (L × B³) / 12
+        I_stern = (self.hull.stern_length * self.hull.beam**3) / 12
+        
+        I_total = I_bow + I_stern
         volume = self.displacement_volume()
-        return I / volume
+        
+        return I_total / volume if volume > 0 else 0
     
     def metacentric_height(self, kg: float) -> float:
         """
@@ -272,6 +328,40 @@ def print_stability_report(calculator: StabilityCalculator, mass_dist: MassDistr
     print(f"  Displacement Mass (Δ):   {displacement:.3f} kg")
     print(f"  Waterplane Area (Aw):    {waterplane:.4f} m²")
     
+    # Buoyancy force and flotation check
+    total_mass, _ = calculator.combined_cg(mass_dist)
+    buoyancy_force = displacement * calculator.g  # N
+    weight_force = total_mass * calculator.g      # N
+    net_force = buoyancy_force - weight_force     # N
+    
+    print(f"\n{'FLOTATION ANALYSIS':^100}")
+    print("-"*100)
+    print(f"  Buoyancy Force (Fb):     {buoyancy_force:.3f} N ↑")
+    print(f"  Weight Force (W):        {weight_force:.3f} N ↓")
+    print(f"  Net Vertical Force:      {net_force:+.3f} N")
+    
+    if abs(net_force) < 0.1:  # Nearly balanced (< 0.1 N difference)
+        flotation_status = "✓ FLOTA EN EQUILIBRIO"
+        flotation_color = "green"
+    elif net_force > 0:
+        flotation_status = f"⚠ FLOTA CON RESERVA DE {net_force:.2f} N (puede cargar más)"
+        flotation_color = "yellow"
+    else:
+        flotation_status = f"✗ SE HUNDE - Falta flotabilidad: {abs(net_force):.2f} N"
+        flotation_color = "red"
+    
+    print(f"  Estado de flotación:     {flotation_status}")
+    
+    # Reserve buoyancy
+    draft_margin = calculator.hull.height - calculator.hull.draft
+    if draft_margin > 0:
+        reserve_volume = waterplane * draft_margin
+        reserve_buoyancy = reserve_volume * calculator.rho * calculator.g
+        additional_load = reserve_buoyancy / calculator.g
+        print(f"  Margen de calado:        {draft_margin*100:.2f} cm")
+        print(f"  Reserva de flotabilidad: {reserve_buoyancy:.2f} N")
+        print(f"  Carga adicional máxima:  {additional_load:.2f} kg")
+    
     # Centers
     kb = calculator.center_of_buoyancy()
     bm = calculator.metacentric_radius()
@@ -353,23 +443,30 @@ def print_stability_report(calculator: StabilityCalculator, mass_dist: MassDistr
 
 def main():
     parser = argparse.ArgumentParser(description='Stability Analysis Calculator')
-    parser.add_argument('--length', type=float, default=0.45, help='Waterline length (m)')
-    parser.add_argument('--beam', type=float, default=0.20, help='Beam (m)')
+    parser.add_argument('--length', type=float, default=0.45, help='Total waterline length (m)')
+    parser.add_argument('--beam', type=float, default=0.172, help='Beam (m)')
     parser.add_argument('--draft', type=float, default=0.055, help='Draft (m)')
-    parser.add_argument('--hull_mass', type=float, default=0.5, help='Hull mass (kg)')
-    parser.add_argument('--hull_cg', type=float, default=0.025, help='Hull CG height (m)')
+    parser.add_argument('--height', type=float, default=0.156, help='Total hull height (m)')
+    parser.add_argument('--hull_mass', type=float, default=1.2, help='Hull mass (kg)')
+    parser.add_argument('--hull_cg', type=float, default=0.04, help='Hull CG height (m)')
     parser.add_argument('--cargo', type=float, default=2.5, help='Cargo mass (kg)')
-    parser.add_argument('--cargo_cg', type=float, default=0.04, help='Cargo CG height (m)')
+    parser.add_argument('--cargo_cg', type=float, default=0.06, help='Cargo CG height (m)')
     parser.add_argument('--plot', action='store_true', help='Generate plots')
     parser.add_argument('--save_plot', type=str, default='stability_analysis.png')
     
     args = parser.parse_args()
     
-    # Setup
+    # Setup with real boat geometry
     hull = HullGeometry(
         length=args.length,
         beam=args.beam,
-        draft=args.draft
+        draft=args.draft,
+        height=args.height,
+        bow_length=0.05,  # 5 cm pyramidal bow
+        bow_base_width=0.172,  # 17.2 cm base
+        stern_length=0.40,  # 40 cm rectangular stern
+        block_coeff=0.70,
+        waterplane_coeff=0.88
     )
     
     mass_dist = MassDistribution(

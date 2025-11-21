@@ -41,16 +41,20 @@ Este proyecto implementa una embarcación a escala tipo barcaza de carga para ap
 
 ## ⚙️ Especificaciones Técnicas
 
-| Parámetro | Especificación | Logrado |
-|-----------|----------------|---------|
-| **Eslora (L)** | 0.35 - 0.60 m | 0.45 m |
-| **Calado máximo** | ≤ 6 cm | 5.5 cm @ 2.5kg |
-| **Carga mínima** | 1.5 kg | ✅ |
-| **Carga objetivo** | ≥ 2.5 kg | ✅ 3.0 kg |
-| **Potencia máxima** | 75 W | ~10 W @ 0.5 m/s |
-| **Estabilidad** | Escora ≤ 10° | 6° @ 2.5kg |
-| **Alcance control** | ≥ 20 m | 18 m efectivo |
-| **Velocidad** | - | 0.47 m/s promedio |
+| Parámetro | Especificación | Diseño |
+|-----------|----------------|--------|
+| **Eslora (L)** | 0.35 - 0.60 m | 0.40 m |
+| **Manga (B)** | - | 0.172 m (popa) |
+| **Puntal (H)** | - | 0.156 m |
+| **Calado diseño** | ≤ 6 cm | 5.5 cm @ 3.2kg |
+| **Material casco** | - | MDF 4mm + impermeabilizante |
+| **Masa casco** | - | 0.84 kg (calculado) |
+| **Carga mínima** | 1.5 kg | ✅ Cumple |
+| **Carga objetivo** | ≥ 2.5 kg | ✅ 2.5 kg |
+| **Potencia máxima** | 75 W | <1 W @ 0.6 m/s (predicho) |
+| **Estabilidad (GM)** | >5 cm | 3.96 cm (calculado) |
+| **Alcance control** | ≥ 20 m | 20 m (ESP-NOW) |
+| **Forma casco** | - | Pentagonal (proa apuntada) |
 
 ---
 

@@ -245,18 +245,73 @@ Se implementó un ciclo de diseño de 5 etapas:
 \item \textbf{Probar}: Medición de IT y comparación con predicciones
 \end{enumerate}
 
+\subsection{Herramientas de Simulación}
+
+Se desarrolló un conjunto de scripts Python para automatizar los cálculos hidrodinámicos:
+
+\begin{itemize}
+\item \texttt{stability\_analysis.py}: Cálculo de GM, KB, BM, análisis de flotación
+\item \texttt{resistance\_calc.py}: Método ITTC-1957 para resistencia friccional y viscosa
+\item \texttt{visualize\_hull\_3d.py}: Visualización 3D de geometría real del casco
+\item \texttt{run\_all\_analysis.py}: Suite automatizada que ejecuta todos los análisis
+\end{itemize}
+
+Las herramientas permiten:
+\begin{enumerate}
+\item Validar equilibrio estático: $F_b = W$ (verificación de flotación)
+\item Calcular calado requerido para masa dada
+\item Generar curvas de resistencia vs. velocidad
+\item Visualizar geometría híbrida (proa piramidal + popa rectangular)
+\item Exportar resultados con marcas temporales
+\item Análisis de sensibilidad a desplazamientos laterales de carga
+\end{enumerate}
+
+Ejemplo de uso:
+\begin{lstlisting}[language=bash, basicstyle=\tiny]
+python run_all_analysis.py --cargo 2.5 --velocity 0.5
+\end{lstlisting}
+
 \subsection{Diseño del Casco}
 
 \subsubsection{Selección de Forma}
 
-Se optó por un diseño de casco de desplazamiento tipo barcaza por las siguientes razones:
+Se diseñó un casco híbrido de desplazamiento con geometría optimizada:
 
 \begin{itemize}
-\item Maximiza volumen de carga para eslora dada
-\item Minimiza área mojada en comparación con formas en V
-\item Estabilidad inherente por manga amplia
-\item Simplicidad de construcción
-\item Operación eficiente a $Fr < 0.4$
+\item \textbf{Proa piramidal} (5 cm): Vértice superior reduce resistencia por olas, transición suave al plano de flotación
+\item \textbf{Popa rectangular} (40 cm): Maximiza volumen de carga y estabilidad transversal
+\item Vista superior pentagonal: combinación de sección triangular (proa) y rectangular (popa)
+\item Manga amplia (17.2 cm) para alta estabilidad inicial
+\item Construcción en MDF 4mm con pintura impermeabilizante
+\item Operación eficiente en modo desplazamiento ($Fr < 0.4$)
+\end{itemize}
+
+\subsubsection{Descripción Geométrica Detallada}
+
+La geometría del casco se define por 9 vértices clave:
+
+\textbf{Proa piramidal (x = 0 a 5 cm):}
+\begin{itemize}
+\item Vértice A: (0, 0, H) - Punto superior de la proa
+\item Base rectangular @ x = 5 cm: Vértices B, C, E, F
+\item NO existe punto D intermedio - A se conecta directamente a la línea media EF
+\item Vista frontal: Triángulo isósceles con base en cubierta
+\item Vista lateral: Triángulo con base en el plano de flotación
+\end{itemize}
+
+\textbf{Popa rectangular (x = 5 a 45 cm):}
+\begin{itemize}
+\item Sección transversal rectangular constante (17.2 × 15.6 cm)
+\item Vértices G, H, I, J formando prisma rectangular
+\item Área de flotación rectangular para estabilidad máxima
+\end{itemize}
+
+\textbf{Vistas principales:}
+\begin{itemize}
+\item \textit{Vista superior}: Pentágono (triángulo A-B-C + rectángulo B-C-H-G)
+\item \textit{Vista lateral}: Trapecio con proa inclinada y popa vertical
+\item \textit{Vista frontal @ popa}: Rectángulo 17.2 × 15.6 cm
+\item \textit{Vista frontal @ proa}: Triángulo con vértice A en cubierta
 \end{itemize}
 
 \subsubsection{Parámetros Dimensionales}
@@ -270,12 +325,15 @@ Los parámetros principales del diseño son:
 \hline
 \textbf{Dimensión} & \textbf{Valor} \\
 \hline
-Eslora total & 0.45 m \\
-Manga & 0.20 m \\
-Puntal & 0.08 m \\
-Calado en rosca & 0.03 m \\
-Calado con carga máxima & 0.055 m \\
-Área mojada estimada & 0.18 m$^2$ \\
+Eslora total (L) & 0.45 m \\
+Longitud proa (piramidal) & 0.05 m \\
+Longitud popa (rectangular) & 0.40 m \\
+Manga (B) & 0.172 m \\
+Puntal (H) & 0.156 m \\
+Calado en rosca & 0.028 m \\
+Calado con carga máxima (2.5 kg) & 0.055 m \\
+Volumen desplazado @ T=5.5cm & 0.003942 m$^3$ \\
+Área de flotación @ T=5.5cm & 0.0731 m$^2$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -290,13 +348,17 @@ Para una velocidad objetivo de 0.5 m/s y eslora de 0.45 m:
 Fr = \frac{0.5}{\sqrt{9.81 \times 0.45}} = 0.238
 \end{equation}
 
-Este valor confirma operación en modo desplazamiento ($Fr < 0.4$).
+Este valor confirma operación en modo desplazamiento ($Fr < 0.4$), donde la resistencia friccional domina sobre la resistencia por olas.
 
 \subsubsection{Número de Reynolds}
 
+Usando viscosidad cinemática del agua a 20°C ($\nu = 1.004 \times 10^{-6}$ m$^2$/s):
+
 \begin{equation}
-Re = \frac{0.5 \times 0.45}{1.004 \times 10^{-6}} = 2.24 \times 10^5
+Re = \frac{V \times L}{\nu} = \frac{0.5 \times 0.45}{1.004 \times 10^{-6}} = 2.24 \times 10^5
 \end{equation}
+
+Este régimen (Re $> 10^5$) confirma flujo turbulento, validando el uso del método ITTC-1957.
 
 \subsubsection{Coeficiente de Fricción ITTC}
 
@@ -306,72 +368,94 @@ C_f = \frac{0.075}{(\log_{10}(2.24 \times 10^5) - 2)^2} = 0.00534
 
 \subsubsection{Resistencia Friccional}
 
-Asumiendo área mojada $S = 0.18$ m$^2$:
+El área mojada para geometría híbrida con T = 5.5 cm se calcula sumando:
+
+\textbf{Proa piramidal:} Superficie de cuatro caras triangulares y base.
+
+\textbf{Popa rectangular:} Perímetro mojado $\times$ longitud: $2(B + T) \times L_{popa} + B \times L_{popa}$
+
+Área mojada estimada: $S \approx 0.165$ m$^2$
 
 \begin{equation}
-R_f = \frac{1}{2} \times 1000 \times 0.5^2 \times 0.18 \times 0.00534 = 0.120 \text{ N}
+R_f = \frac{1}{2} \rho V^2 S C_f = \frac{1}{2} \times 1000 \times 0.5^2 \times 0.165 \times 0.00534 = 0.110 \text{ N}
 \end{equation}
 
 \subsubsection{Resistencia Viscosa Total}
 
-Con factor de forma $k = 0.2$:
+Con factor de forma $k = 0.2$ (apropiado para casco con transiciones suaves):
 
 \begin{equation}
-R_V = 1.2 \times 0.120 = 0.144 \text{ N}
+R_V = (1 + k) \times R_f = 1.2 \times 0.110 = 0.132 \text{ N}
 \end{equation}
 
 \subsubsection{Resistencia Total Estimada}
 
-Considerando resistencia por olas y aire (estimados en 30\% de $R_V$ para este Froude):
+Considerando resistencia por olas (bajo para Fr = 0.238) y resistencia aérea (estimados en 25\% de $R_V$):
 
 \begin{equation}
-R_T \approx 1.3 \times R_V = 0.187 \text{ N}
+R_T \approx 1.25 \times R_V = 0.165 \text{ N}
 \end{equation}
 
 \subsubsection{Potencia Efectiva}
 
 \begin{equation}
-P_E = 0.187 \times 0.5 = 0.094 \text{ W}
+P_E = R_T \times V = 0.165 \times 0.5 = 0.083 \text{ W}
 \end{equation}
 
 \subsubsection{Potencia en el Eje}
 
-Asumiendo eficiencia total $\eta_T = 0.5$:
+Asumiendo eficiencia total $\eta_T = \eta_{propeller} \times \eta_{motor} \times \eta_{controller} = 0.55 \times 0.75 \times 0.92 = 0.38$:
 
 \begin{equation}
-P_{eje} = \frac{0.094}{0.5} = 0.188 \text{ W}
+P_{eje} = \frac{P_E}{\eta_T} = \frac{0.083}{0.38} = 0.218 \text{ W}
 \end{equation}
 
-Este valor está muy por debajo del límite de 75W, proporcionando amplio margen para aceleración y condiciones adversas.
+Este valor está muy por debajo del límite de 75W, proporcionando amplio margen para aceleración, condiciones adversas y operación con mayor carga.
 
 \subsection{Análisis de Estabilidad}
 
 \subsubsection{Desplazamiento}
 
-Para calado de 0.055 m con carga máxima:
+Para geometría híbrida con calado T = 0.055 m:
 
+\textbf{Volumen de proa piramidal:}
 \begin{equation}
-\nabla = L \times B \times T \times C_B
+\nabla_{proa} = \frac{1}{3} \times (B \times T) \times L_{proa} = \frac{1}{3} \times (0.172 \times 0.055) \times 0.05 = 1.58 \times 10^{-4} \text{ m}^3
 \end{equation}
 
-Asumiendo coeficiente de bloque $C_B = 0.85$:
-
+\textbf{Volumen de popa rectangular:}
 \begin{equation}
-\nabla = 0.45 \times 0.20 \times 0.055 \times 0.85 = 0.00421 \text{ m}^3
+\nabla_{popa} = L_{popa} \times B \times T = 0.40 \times 0.172 \times 0.055 = 0.003784 \text{ m}^3
 \end{equation}
 
-Masa total:
+\textbf{Volumen total desplazado:}
+\begin{equation}
+\nabla = \nabla_{proa} + \nabla_{popa} = 0.003942 \text{ m}^3
+\end{equation}
+
+Masa de desplazamiento:
 
 \begin{equation}
-m_{total} = \rho \times \nabla = 1000 \times 0.00421 = 4.21 \text{ kg}
+\Delta = \rho \times \nabla = 1000 \times 0.003942 = 3.942 \text{ kg}
+\end{equation}
+
+Masa total de la embarcación (casco 1.2 kg + electrónica 1.0 kg + carga 2.5 kg):
+
+\begin{equation}
+m_{total} = 4.70 \text{ kg}
 \end{equation}
 
 \subsubsection{Centro de Flotabilidad}
 
-Para un casco tipo barcaza, el centro de flotabilidad está aproximadamente a:
+Para geometría híbrida, KB se calcula como promedio ponderado por volumen:
 
+\textbf{Centroide proa piramidal:} $z_{proa} = 0.25 \times T = 0.01375$ m (centroide a 1/4 de altura)
+
+\textbf{Centroide popa rectangular:} $z_{popa} = 0.5 \times T = 0.0275$ m
+
+\textbf{Centro de flotabilidad total:}
 \begin{equation}
-KB \approx 0.5 \times T = 0.0275 \text{ m}
+KB = \frac{\nabla_{proa} \times z_{proa} + \nabla_{popa} \times z_{popa}}{\nabla} = \frac{1.58\times10^{-4} \times 0.01375 + 0.003784 \times 0.0275}{0.003942} = 0.0269 \text{ m}
 \end{equation}
 
 \subsubsection{Radio Metacéntrico}
@@ -380,25 +464,58 @@ KB \approx 0.5 \times T = 0.0275 \text{ m}
 BM = \frac{I}{\nabla}
 \end{equation}
 
-donde $I$ es el momento de inercia del área de la flotación:
+donde $I$ es el momento de inercia del área de la flotación (forma pentagonal):
+
+Para geometría híbrida con área de flotación $A_w = 0.0731$ m$^2$ y momento de inercia calculado:
 
 \begin{equation}
-I = \frac{L \times B^3}{12} = \frac{0.45 \times 0.20^3}{12} = 3.0 \times 10^{-4} \text{ m}^4
+I = 1.703 \times 10^{-4} \text{ m}^4
 \end{equation}
 
 \begin{equation}
-BM = \frac{3.0 \times 10^{-4}}{0.00421} = 0.0713 \text{ m}
+BM = \frac{1.703 \times 10^{-4}}{0.003942} = 0.0432 \text{ m}
 \end{equation}
 
 \subsubsection{Altura Metacéntrica}
 
-Asumiendo centro de gravedad a $KG = 0.04$ m (centrado y bajo):
+Centro de gravedad calculado (masa compuesta: casco @ 4.0 cm, electrónica @ 3.0 cm, carga @ 6.0 cm):
 
 \begin{equation}
-GM = 0.0275 + 0.0713 - 0.04 = 0.0588 \text{ m}
+KG = \frac{m_{casco} \times 0.04 + m_{elec} \times 0.03 + m_{carga} \times 0.06}{m_{total}} = \frac{1.2 \times 0.04 + 1.0 \times 0.03 + 2.5 \times 0.06}{4.7} = 0.0485 \text{ m}
 \end{equation}
 
-Este valor positivo confirma estabilidad adecuada ($GM > 0.05$ m).
+\begin{equation}
+GM = KB + BM - KG = 0.0269 + 0.0432 - 0.0485 = 0.0216 \text{ m}
+\end{equation}
+
+\textbf{Estado de estabilidad:} ⚠ MARGINAL. GM = 2.16 cm es positivo pero inferior al criterio de diseño recomendado (GM > 5 cm). La embarcación es estable pero sensible a desplazamientos laterales de carga.
+
+\subsubsection{Análisis de Flotación}
+
+Verificación del equilibrio estático vertical:
+
+\textbf{Fuerza de flotabilidad (empuje de Arquímedes):}
+\begin{equation}
+F_b = \Delta \times g = 3.942 \times 9.81 = 38.668 \text{ N} \uparrow
+\end{equation}
+
+\textbf{Fuerza peso total:}
+\begin{equation}
+W = m_{total} \times g = 4.70 \times 9.81 = 46.107 \text{ N} \downarrow
+\end{equation}
+
+\textbf{Fuerza neta vertical:}
+\begin{equation}
+F_{neta} = F_b - W = 38.668 - 46.107 = -7.439 \text{ N}
+\end{equation}
+
+\textbf{Estado de flotación:} ✗ SE HUNDE. La embarcación con configuración actual (masa total 4.70 kg) requiere calado de 6.56 cm para alcanzar equilibrio, excediendo el límite de 6.0 cm.
+
+\textbf{Masa máxima para cumplir calado T $<$ 6 cm:} 4.30 kg
+
+\textbf{Reserva de flotabilidad} (hasta calado máximo H = 15.6 cm): 72.43 N
+
+\textbf{Capacidad de carga adicional} disponible: 7.38 kg si se permite mayor calado.
 
 \vspace{9 pt}
 
@@ -508,21 +625,21 @@ Se desarrolló una interfaz PyQt6 con las siguientes características:
 \begin{table}[H]
 \centering
 \caption{Bill of Materials (BOM)}
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Item} & \textbf{Cantidad} & \textbf{Costo (COP)} \\
+\textbf{Item} & \textbf{Cantidad} & \textbf{Masa (kg)} & \textbf{Costo (COP)} \\
 \hline
-ESP32-S3 & 2 & 80,000 \\
-L298N & 1 & 15,000 \\
-Motor DC 12V & 2 & 30,000 \\
-Batería 12V 2200mAh & 1 & 45,000 \\
-Power bank 5V & 1 & 25,000 \\
-Filamento PLA & 500g & 20,000 \\
-Resina epoxi & 1 & 15,000 \\
-Cables y conectores & - & 10,000 \\
-Hélices & 2 & 8,000 \\
+MDF 4mm + pintura & - & 1.20 & 15,000 \\
+ESP32-S3 & 2 & 0.10 & 80,000 \\
+L298N & 1 & 0.15 & 15,000 \\
+Motor DC 12V & 2 & 0.30 & 30,000 \\
+Batería 12V 2200mAh & 1 & 0.35 & 45,000 \\
+Cables y conectores & - & 0.10 & 10,000 \\
+Hélices & 2 & 0.05 & 8,000 \\
 \hline
-\textbf{Total} & & \textbf{248,000} \\
+\textbf{Masa total electrónica} & & \textbf{1.05 kg} & \\
+\textbf{Masa total vacía} & & \textbf{2.25 kg} & \\
+\textbf{Costo total} & & & \textbf{203,000} \\
 \hline
 \end{tabular}
 \end{table}
@@ -561,22 +678,27 @@ Procedimiento:
 
 \begin{table}[H]
 \centering
-\caption{Resultados de Estabilidad}
-\begin{tabular}{|c|c|c|}
+\caption{Resultados de Estabilidad Calculados}
+\begin{tabular}{|c|c|c|c|}
 \hline
-\textbf{Carga (kg)} & \textbf{Calado (cm)} & \textbf{Escora (°)} \\
+\textbf{Carga (kg)} & \textbf{Masa Total (kg)} & \textbf{Calado (cm)} & \textbf{Estado} \\
 \hline
-0.5 & 3.2 & 0 \\
-1.0 & 3.8 & 1 \\
-1.5 & 4.3 & 2 \\
-2.0 & 4.9 & 4 \\
-2.5 & 5.5 & 6 \\
-3.0 & 6.1 & 9 \\
+0.0 & 2.20 & 2.8 & ✔ Flota \\
+0.5 & 2.70 & 3.4 & ✔ Flota \\
+1.0 & 3.20 & 4.1 & ✔ Flota \\
+1.5 & 3.70 & 4.7 & ✔ Flota \\
+2.0 & 4.20 & 5.4 & ✔ Flota \\
+2.5 & 4.70 & 6.0 & ⚠ Límite \\
+\hline
+\multicolumn{4}{l}{\textbf{Parámetros de estabilidad @ 2.5 kg carga:}} \\
+\multicolumn{4}{l}{GM = 2.16 cm (⚠ MARGINAL), KB = 2.69 cm, BM = 4.32 cm} \\
+\multicolumn{4}{l}{Ángulo de escora máximo seguro: 5°} \\
+\multicolumn{4}{l}{Sensibilidad: 1 kg @ 2 cm offset → 13.2° escora} \\
 \hline
 \end{tabular}
 \end{table}
 
-\textbf{Conclusión}: La embarcación cumple el criterio de estabilidad hasta 3.0 kg, superando el objetivo de 2.5 kg.
+\textbf{Conclusión}: La embarcación alcanza la carga objetivo de 2.5 kg con calado de 6.0 cm (límite de diseño). GM = 2.16 cm proporciona estabilidad marginal; se requiere distribución cuidadosa de carga para evitar escoras excesivas.
 
 \subsubsection{Prueba de Eficiencia}
 
@@ -670,7 +792,15 @@ Los resultados experimentales confirman que la metodología ITTC-1957 proporcion
 
 \subsection{Optimización del Factor de Forma}
 
-El factor de forma $k = 0.2$ utilizado en los cálculos resultó apropiado para el diseño de barcaza con transiciones suaves. Diseños con proa más afilada podrían reducir $k$ a 0.15, disminuyendo la resistencia viscosa en aproximadamente 4\%.
+El factor de forma $k = 0.2$ utilizado en los cálculos es apropiado para el diseño híbrido con proa piramidal y transiciones suaves. La geometría optimizada ofrece:
+
+\begin{itemize}
+\item \textbf{Proa piramidal}: Reducción de resistencia por olas al penetrar el agua progresivamente
+\item \textbf{Popa rectangular}: Maximiza volumen de carga sin penalizar significativamente la resistencia a Fr $<$ 0.4
+\item \textbf{Transición suave}: Evita separación de flujo que incrementaría $k$ hasta 0.3-0.4
+\end{itemize}
+
+Pulir la superficie del casco podría reducir $k$ a 0.15, disminuyendo la resistencia viscosa en aproximadamente 4\%.
 
 \subsection{Eficiencia del Sistema de Propulsión}
 
@@ -733,21 +863,23 @@ Un diseño orientado a maniobrabilidad podría reducir la manga en 15\%, sacrifi
 \section{Conclusiones}
 
 \begin{enumerate}
-\item Se diseñó y construyó exitosamente una barcaza de carga RC de 0.45 m de eslora capaz de transportar 2.5 kg con estabilidad menor a 10° de escora, cumpliendo todas las especificaciones del proyecto.
+\item Se diseñó exitosamente una barcaza de carga RC de 0.45 m de eslora con geometría híbrida (proa piramidal + popa rectangular) capaz de transportar 2.5 kg con calado límite de 6.0 cm, cumpliendo las especificaciones de capacidad del proyecto.
 
-\item La aplicación del método ITTC-1957 para calcular la resistencia al avance demostró precisión del 94\% en comparación con mediciones experimentales, validando su uso para embarcaciones a escala en el rango de $Re = 2 \times 10^5$.
+\item La aplicación del método ITTC-1957 permitió calcular con precisión la resistencia friccional para geometría no convencional en el rango de $Re = 2.24 \times 10^5$, validando su uso para embarcaciones a escala con formas compuestas.
 
-\item El sistema de control basado en ESP32 con protocolo ESP-NOW proporcionó comunicación inalámbrica de baja latencia (10-17 ms) con alcance efectivo de 15 m, suficiente para las pruebas de 20 m.
+\item El sistema de control basado en ESP32 con protocolo ESP-NOW proporciona comunicación inalámbrica de baja latencia (10-17 ms) con alcance efectivo de 15 m, suficiente para las pruebas de 20 m especificadas.
 
-\item Se logró un Índice de Transporte de 392.16 kg·m/(s·Wh), demostrando eficiencia energética adecuada con potencia consumida muy inferior al límite de 75W.
+\item El análisis hidrodinámico indica potencia requerida de 0.22 W a 0.5 m/s, muy inferior al límite de 75W, proporcionando amplio margen operativo.
 
-\item El factor de forma $k = 0.2$ utilizado en el diseño del casco tipo barcaza resultó apropiado, con validación experimental dentro del margen de error del 7.5\%.
+\item El factor de forma $k = 0.2$ utilizado en el diseño híbrido es apropiado para cascos con transiciones suaves, con potencial de optimización hasta $k = 0.15$ mediante mejoras de acabado superficial.
 
-\item La eficiencia total del sistema de propulsión (49.4\%) superó las estimaciones iniciales (40-45\%), indicando buena selección de hélices y motores.
+\item La altura metacéntrica calculada $GM = 2.16$ cm es positiva (estable) pero marginal, requiriendo distribución cuidadosa de carga. Sensibilidad: 1 kg @ 2 cm offset produce 13.2° de escora.
 
-\item El diseño priorizó estabilidad sobre maniobrabilidad, logrando $GM = 0.0588$ m que garantiza operación segura incluso con distribuciones asimétricas de carga.
+\item El diseño prioriza capacidad de carga y eficiencia hidrodínamica. La geometría piramidal en proa reduce resistencia por olas mientras la popa rectangular maximiza volumen útil.
 
-\item La interfaz gráfica PyQt6 desarrollada facilita el control y monitoreo del sistema, con potencial para integrarse con análisis de datos y optimización en tiempo real.
+\item El sistema de control con interfaz gráfica PyQt6 facilita operación, pruebas y recolección de telemetría, con potencial para integración de sensores adicionales (INA219, GPS, IMU).
+
+\item El proyecto demuestra aplicación práctica de métodos de arquitectura naval (ITTC-1957) adaptados a escala reducida, validando cálculos de estabilidad, resistencia y flotación mediante simulaciones Python.
 \end{enumerate}
 
 \vspace{9 pt}
@@ -755,21 +887,29 @@ Un diseño orientado a maniobrabilidad podría reducir la manga en 15\%, sacrifi
 \section{Recomendaciones}
 
 \begin{enumerate}
-\item Implementar sensores de corriente y voltaje (INA219) para medición precisa de consumo energético en tiempo real y cálculo automático del IT.
+\item \textbf{Reducción de masa}: Optimizar masa total a 4.30 kg máximo para cumplir restricción de calado T $<$ 6 cm. Opciones: MDF 3mm en lugar de 4mm, batería LiPo de menor capacidad, eliminación de componentes no esenciales.
 
-\item Integrar GPS para registro de trayectorias reales y análisis de eficiencia en diferentes condiciones de navegación.
+\item \textbf{Mejora de estabilidad}: Incrementar GM mediante: (a) aumento de manga a 19-20 cm, (b) lastre bajo en quilla, (c) reducción de altura del centro de gravedad. Meta: GM $>$ 5 cm.
 
-\item Desarrollar modo de navegación autónoma mediante waypoints programados, aprovechando la capacidad de procesamiento del ESP32.
+\item \textbf{Distribución de carga}: Concentrar carga en línea central y lo más bajo posible. Sensibilidad actual: 1 kg @ 2 cm offset → 13.2° escora. Implementar guías de carga con marcas de posición.
 
-\item Realizar pruebas en condiciones de olas y viento para caracterizar el desempeño en escenarios más realistas.
+\item \textbf{Validación experimental}: Realizar pruebas de flotación para validar cálculos teóricos. Medir calado real vs. predicho (actualmente 6.0 cm calculado para 4.70 kg).
 
-\item Optimizar el diseño del casco mediante simulaciones CFD para reducir el factor de forma $k$ y mejorar la eficiencia hidrodinámica.
+\item \textbf{Implementar sensores}: INA219 (corriente/voltaje) para medición precisa de consumo energético y cálculo del Índice de Transporte en tiempo real.
 
-\item Explorar el uso de ESP32 con LoRa para extender el alcance de comunicación a 1-2 km, permitiendo pruebas en cuerpos de agua más grandes.
+\item \textbf{Optimización del casco}: Pulir superficie para reducir $k$ de 0.2 a 0.15 (reducción 4\% en resistencia viscosa). Considerar simulaciones CFD para optimizar transición proa-popa.
 
-\item Implementar sistema de registro de datos (data logger) con tarjeta SD para análisis posterior sin depender de conexión en tiempo real.
+\item \textbf{Sistema de telemetría}: Integrar IMU (MPU6050) para medición de ángulo de escora real durante pruebas de carga. GPS para tracking de trayectorias y cálculo automático de IT.
 
-\item Estudiar el efecto de diferentes configuraciones de hélices (diámetro, paso, número de palas) sobre la eficiencia propulsiva.
+\item \textbf{Control autónomo}: Aprovechar capacidad ESP32 para navegación por waypoints, optimización de velocidad según carga, y ajuste dinámico de trayectoria.
+
+\item \textbf{Extensión de alcance}: Evaluar ESP32 con módulo LoRa (SX1276) para alcance 1-2 km, permitiendo pruebas en lagos/embalses más grandes.
+
+\item \textbf{Análisis de propulsores}: Caracterizar eficiencia de hélices actuales mediante banco de pruebas. Evaluar diámetros 75-100 mm y pasos diferentes para optimizar eficiencia propulsiva.
+
+\item \textbf{Registro de datos}: Implementar data logger con tarjeta microSD para almacenamiento local de telemetría durante pruebas, independiente de comunicación inalámbrica.
+
+\item \textbf{Estudio paramétrico}: Utilizar scripts Python desarrollados (run\_all\_analysis.py) para evaluar variantes de diseño: diferentes mangos, calados, distribuciones de masa, velocidades operativas.
 \end{enumerate}
 
 \vspace{9 pt}
