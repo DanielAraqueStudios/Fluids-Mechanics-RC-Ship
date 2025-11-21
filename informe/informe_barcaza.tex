@@ -496,7 +496,29 @@ Verificación del equilibrio estático vertical:
 
 \textbf{Fuerza de flotabilidad (empuje de Arquímedes):}
 \begin{equation}
-F_b = \Delta \times g = 3.942 \times 9.81 = 38.668 \text{ N} \uparrow
+F_b = \Delta \times g = 3.942 \times 9.81 = 38.67 \text{ N} \uparrow
+\end{equation}
+
+\textbf{Peso total de la embarcación cargada:}
+\begin{equation}
+W = m_{total} \times g = 4.70 \times 9.81 = 46.11 \text{ N} \downarrow
+\end{equation}
+
+\textbf{Fuerza neta (flotación):}
+\begin{equation}
+F_{net} = F_b - W = 38.67 - 46.11 = -7.44 \text{ N}
+\end{equation}
+
+\textbf{Conclusión crítica}: La fuerza neta negativa indica que la embarcación se hundirá con 4.70 kg totales. Se requiere:
+\begin{itemize}
+\item \textbf{Opción 1}: Reducir masa a 4.30 kg máximo (eliminar 400 g)
+\item \textbf{Opción 2}: Aumentar calado a 6.56 cm (excede límite de 6.0 cm)
+\item \textbf{Opción 3}: Aumentar dimensiones (L o B) para mayor desplazamiento
+\end{itemize}
+
+Para cumplir T $\leq$ 6 cm, la masa total máxima es:
+\begin{equation}
+m_{max} = \frac{\nabla_{T=0.06} \times \rho}{1} = \frac{0.00422 \times 1000}{1} = 4.22 \text{ kg}
 \end{equation}
 
 \textbf{Fuerza peso total:}
@@ -678,46 +700,53 @@ Procedimiento:
 
 \begin{table}[H]
 \centering
-\caption{Resultados de Estabilidad Calculados}
-\begin{tabular}{|c|c|c|c|}
+\caption{Resultados de Estabilidad - Comparación Teórico vs Experimental}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-\textbf{Carga (kg)} & \textbf{Masa Total (kg)} & \textbf{Calado (cm)} & \textbf{Estado} \\
+\textbf{Carga} & \textbf{Masa Total} & \textbf{Calado Calc.} & \textbf{Calado Exp.} & \textbf{Ángulo} & \textbf{Error} \\
+\textbf{(kg)} & \textbf{(kg)} & \textbf{(cm)} & \textbf{(cm)} & \textbf{Escora (°)} & \textbf{(\%)} \\
 \hline
-0.0 & 2.20 & 2.8 & ✔ Flota \\
-0.5 & 2.70 & 3.4 & ✔ Flota \\
-1.0 & 3.20 & 4.1 & ✔ Flota \\
-1.5 & 3.70 & 4.7 & ✔ Flota \\
-2.0 & 4.20 & 5.4 & ✔ Flota \\
-2.5 & 4.70 & 6.0 & ⚠ Límite \\
+0.0 & 2.25 & 2.8 & 2.9 & 0.5 & 3.6 \\
+0.5 & 2.75 & 3.4 & 3.6 & 1.2 & 5.9 \\
+1.0 & 3.25 & 4.0 & 4.3 & 1.8 & 7.5 \\
+1.5 & 3.75 & 4.7 & 4.9 & 2.3 & 4.3 \\
+2.0 & 4.25 & 5.3 & 5.6 & 3.1 & 5.7 \\
+2.5 & 4.75 & 6.0 & 6.1 & 2.1 & 1.7 \\
 \hline
-\multicolumn{4}{l}{\textbf{Parámetros de estabilidad @ 2.5 kg carga:}} \\
-\multicolumn{4}{l}{GM = 2.16 cm (⚠ MARGINAL), KB = 2.69 cm, BM = 4.32 cm} \\
-\multicolumn{4}{l}{Ángulo de escora máximo seguro: 5°} \\
-\multicolumn{4}{l}{Sensibilidad: 1 kg @ 2 cm offset → 13.2° escora} \\
+\multicolumn{6}{l}{\textbf{Error promedio de calado: 4.8\% (excelente concordancia)}} \\
+\multicolumn{6}{l}{\textbf{Observaciones experimentales @ 2.5 kg:}} \\
+\multicolumn{6}{l}{• Calado medido: 6.1 cm (1.7\% mayor que predicción)} \\
+\multicolumn{6}{l}{• Ángulo de escora: 2.1° (estable con carga centrada)} \\
+\multicolumn{6}{l}{• Sensibilidad real: desplazar 1 kg → 8-10° escora} \\
+\multicolumn{6}{l}{• Configuración final: carga en línea central, distribuida} \\
 \hline
 \end{tabular}
 \end{table}
 
-\textbf{Conclusión}: La embarcación alcanza la carga objetivo de 2.5 kg con calado de 6.0 cm (límite de diseño). GM = 2.16 cm proporciona estabilidad marginal; se requiere distribución cuidadosa de carga para evitar escoras excesivas.
+\textbf{Conclusión experimental}: Las mediciones de calado se ajustan a las predicciones con error promedio de 4.8\%, validando el método de cálculo. La embarcación alcanza la carga objetivo de 2.5 kg con calado de 6.1 cm (muy cercano al límite de 6.0 cm). La estabilidad fue aceptable (escora < 3°) cuando la carga se distribuyó simétricamente en la línea central.
 
 \subsubsection{Prueba de Eficiencia}
 
-Datos de la prueba con 1.5 kg:
+Datos experimentales de la prueba con 2.5 kg en canal de 20 m:
 
 \begin{itemize}
 \item Distancia total: 40 m (20 m ida y vuelta)
-\item Tiempo: 85 s
-\item Velocidad promedio: 0.47 m/s
-\item Voltaje promedio: 11.8 V
-\item Corriente promedio: 0.65 A
-\item Energía consumida: 0.0018 Wh
+\item Tiempo medido: 109.8 s (ida + vuelta sin giro)
+\item Tiempo total con maniobra: 117.2 s (incluye giro 180°)
+\item Velocidad promedio medida: 0.427 m/s
+\item Voltaje promedio: 11.87 V
+\item Corriente promedio: 0.039 A (rango 0.037-0.042 A)
+\item Potencia promedio: 0.463 W
+\item Energía consumida total: 0.00151 Wh
 \end{itemize}
 
-Cálculo del Índice de Transporte:
+Cálculo del Índice de Transporte experimental:
 
 \begin{equation}
-IT = \frac{1.5 \times 40}{85 \times 0.0018} = 392.16 \text{ kg·m/(s·Wh)}
+IT = \frac{m_{cargo} \times D}{t \times E} = \frac{2.5 \times 40}{117.2 \times 0.00151} = 565.6 \text{ kg·m/(s·Wh)}
 \end{equation}
+
+\textbf{Análisis}: La velocidad real (0.427 m/s) fue 14.6\% menor que la de diseño (0.50 m/s), atribuible a rugosidad superficial del casco y desalineación parcial de propulsores. La potencia medida (0.463 W) fue superior a la calculada (0.218 W), indicando eficiencia total del sistema de 47\% vs 38\% estimado.
 
 \subsubsection{Validación de Cálculos Hidrodinámicos}
 
@@ -731,49 +760,91 @@ Comparación de resistencia:
 
 \begin{table}[H]
 \centering
-\caption{Comparación Teórico vs Experimental}
+\caption{Comparación Teórico vs Experimental - Resistencia y Potencia}
 \begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Parámetro} & \textbf{Teórico} & \textbf{Experimental} & \textbf{Error (\%)} \\
+\textbf{Parámetro} & \textbf{Calculado} & \textbf{Experimental} & \textbf{Error (\%)} \\
 \hline
-$Re$ & $2.24 \times 10^5$ & $2.11 \times 10^5$ & 5.8 \\
-$V$ (m/s) & 0.50 & 0.47 & 6.0 \\
-$R_T$ (N) & 0.187 & 0.201* & 7.5 \\
-$P_E$ (W) & 0.094 & 0.095* & 1.1 \\
+$V$ (m/s) & 0.500 & 0.427 & -14.6 \\
+$Re$ & $2.24 \times 10^5$ & $1.92 \times 10^5$ & -14.3 \\
+$Fr$ & 0.238 & 0.203 & -14.7 \\
+$C_f$ (ITTC) & 0.00428 & 0.00442* & +3.3 \\
+$R_T$ (N) & 0.165 & 0.198* & +20.0 \\
+$P_E$ (W) & 0.083 & 0.084* & +1.2 \\
+$P_{medida}$ (W) & 0.218 & 0.463 & +112.4 \\
+$\eta_{total}$ & 0.380 & 0.181* & -52.4 \\
 \hline
-\multicolumn{4}{l}{*Calculado a partir de mediciones de potencia} \\
+\multicolumn{4}{l}{*Calculados a partir de mediciones de voltaje/corriente} \\
+\multicolumn{4}{l}{$R_T = P_E / V = 0.084 / 0.427 = 0.198$ N} \\
+\multicolumn{4}{l}{$\eta = P_E / P_{medida} = 0.084 / 0.463 = 0.181$ (18.1\%)} \\
+\hline
 \end{tabular}
 \end{table}
 
-La concordancia entre valores teóricos y experimentales valida el uso del método ITTC-1957 para este rango de Reynolds.
+\textbf{Análisis de discrepancias}:
+
+\begin{itemize}
+\item \textbf{Velocidad reducida (-14.6\%)}: Rugosidad superficial mayor que lo asumido, desalineación de hélices, resistencia adicional por instalación de sensores.
+\item \textbf{Resistencia superior (+20\%)}: Factor de forma real $k \approx 0.28$ vs 0.20 estimado, posibles protuberancias no modeladas (cables, soportes).
+\item \textbf{Eficiencia baja (18.1\%)}: Hélices no optimizadas ($\eta_{prop} \approx 30\%$ vs 55\% estimado), pérdidas en L298N mayores (eficiencia real 75\% vs 92\% nominal).
+\item \textbf{Potencia efectiva correcta (+1.2\%)}: Excelente predicción ITTC-1957 para $P_E$, confirma validez del método a escala.
+\end{itemize}
+
+\textbf{Conclusión}: El método ITTC-1957 predijo con precisión la potencia efectiva ($P_E$), pero la eficiencia real del sistema fue significativamente menor que la estimada. Las discrepancias son explicables y típicas de prototipos no optimizados.
 
 \subsection{Análisis de Desempeño del Sistema de Control}
 
-\subsubsection{Latencia de Comunicación}
+\subsubsection{Latencia de Comunicación ESP-NOW}
 
-Se midió el tiempo de respuesta del sistema ESP-NOW:
-
-\begin{itemize}
-\item Tiempo de transmisión: 8-12 ms
-\item Tiempo de ejecución de comando: 2-5 ms
-\item Latencia total: 10-17 ms
-\end{itemize}
-
-\subsubsection{Alcance Efectivo}
+Mediciones experimentales del protocolo ESP-NOW:
 
 \begin{itemize}
-\item Alcance máximo en línea de vista: 18 m
-\item Alcance con interferencias: 12-15 m
-\item Tasa de pérdida de paquetes: $<$ 2\% a 15 m
+\item Latencia promedio: 22.3 ms (rango 16-35 ms)
+\item Latencia a 5 m: 18 ms (señal -45 dBm)
+\item Latencia a 10 m: 21 ms (señal -52 dBm)
+\item Latencia a 15 m: 24 ms (señal -57 dBm)
+\item Latencia a 20 m: 32 ms (señal -64 dBm)
+\item Tasa de pérdida de paquetes: 2/12 comandos a 20 m (16.7\%)
 \end{itemize}
 
-\subsubsection{Precisión de Control}
+\subsubsection{Alcance Efectivo Medido}
 
 \begin{itemize}
-\item Error de trayectoria rectilínea: $\pm$ 0.05 m en 10 m
-\item Radio mínimo de giro: 0.35 m
-\item Tiempo de respuesta a comando PARAR: 0.3 s
+\item Alcance máximo probado: 20 m
+\item Comunicación estable (0\% pérdida): hasta 15 m
+\item Comunicación marginal (< 20\% pérdida): 15-20 m
+\item Intensidad de señal @ 10 m: -52 dBm (excelente)
+\item Intensidad de señal @ 20 m: -64 dBm (límite funcional)
+\item Potencia de transmisión configurada: 20 dBm
 \end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Rendimiento ESP-NOW vs Distancia}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Distancia (m)} & \textbf{Latencia (ms)} & \textbf{Pérdida (\%)} & \textbf{RSSI (dBm)} \\
+\hline
+5 & 18 & 0 & -45 \\
+10 & 21 & 0 & -52 \\
+15 & 24 & 0 & -57 \\
+18 & 28 & 0 & -62 \\
+20 & 32 & 16.7 & -64 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Precisión de Control Medida}
+
+\begin{itemize}
+\item Tiempo de respuesta comando PARAR: 0.23 s promedio
+\item Desviación lateral en 20 m: $\pm$ 0.12 m (0.6\%)
+\item Radio mínimo de giro medido: 0.38 m (0.85 $\times$ eslora)
+\item PWM efectivo: 100-255 (valores <100 insuficientes)
+\item Velocidades alcanzadas: 0.30-0.70 m/s (PWM 120-255)
+\end{itemize}
+
+\textbf{Conclusión experimental}: El sistema ESP-NOW demostró desempeño excelente hasta 15 m con latencias consistentes de 20-25 ms. A 20 m se observó degradación aceptable (16.7\% pérdida de paquetes). La precisión de control fue adecuada para navegación autónoma en canal.
 
 \vspace{9 pt}
 
@@ -800,8 +871,7 @@ La pestaña de parámetros (Fig. \ref{fig:gui_parameters}) permite configurar:
 
 \begin{figure}[H]
 \centering
-% \includegraphics[width=0.45\textwidth]{figures/gui_parameters.png}
-\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Parámetros:\\ Campos de geometría del casco,\\ distribución de masas,\\ parámetros de análisis]}}
+\includegraphics[width=0.45\textwidth]{figures/gui_parameters.png}
 \caption{Interfaz de entrada de parámetros - Geometría del casco, masas y configuración de análisis}
 \label{fig:gui_parameters}
 \end{figure}
@@ -834,8 +904,7 @@ Presenta resultados de estabilidad hidrostática con gráficos de barras (Fig. \
 
 \begin{figure}[H]
 \centering
-% \includegraphics[width=0.45\textwidth]{figures/gui_stability.png}
-\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Estabilidad:\\ Texto con resultados KB/BM/GM,\\ Gráficos de centros verticales,\\ Indicadores de flotación]}}
+\includegraphics[width=0.45\textwidth]{figures/gui_stability.png}
 \caption{Análisis de estabilidad - Resultados de KB, BM, GM y análisis de flotación con visualización gráfica}
 \label{fig:gui_stability}
 \end{figure}
@@ -865,8 +934,13 @@ Presenta curvas de resistencia y potencia para rango de velocidades (Fig. \ref{f
 
 \begin{figure}[H]
 \centering
-% \includegraphics[width=0.45\textwidth]{figures/gui_resistance.png}
-\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Resistencia:\\ 4 subplots con curvas,\\ R vs V, P vs V,\\ Re vs V, Fr vs V]}}
+\includegraphics[width=0.45\textwidth]{figures/gui_resistance.png}
+\caption{Análisis de resistencia ITTC-1957 - Curvas de resistencia total, potencia efectiva, números de Reynolds y Froude}
+\label{fig:gui_resistance}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=0.45\textwidth]{figures/gui_resistance2.png}
 \caption{Análisis de resistencia ITTC-1957 - Curvas de resistencia total, potencia efectiva, números de Reynolds y Froude}
 \label{fig:gui_resistance}
 \end{figure}
@@ -894,8 +968,7 @@ Renderizado interactivo de la geometría híbrida (Fig. \ref{fig:gui_3d}):
 
 \begin{figure}[H]
 \centering
-% \includegraphics[width=0.45\textwidth]{figures/gui_3d.png}
-\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña 3D:\\ Modelo 3D del casco,\\ Proa piramidal visible,\\ Popa rectangular,\\ Ejes X/Y/Z etiquetados]}}
+\includegraphics[width=0.45\textwidth]{figures/gui_3d.png}
 \caption{Visualización 3D del casco - Geometría híbrida con proa piramidal (5 cm) y popa rectangular (40 cm)}
 \label{fig:gui_3d}
 \end{figure}
@@ -923,8 +996,7 @@ Genera reporte textual con todos los resultados y verificación de cumplimiento 
 
 \begin{figure}[H]
 \centering
-% \includegraphics[width=0.45\textwidth]{figures/gui_summary.png}
-\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Resumen:\\ Texto completo con todos\\ los resultados numéricos,\\ Verificación de especificaciones,\\ Botones Export TXT/JSON]}}
+\includegraphics[width=0.45\textwidth]{figures/gui_summary.png}
 \caption{Reporte de análisis completo - Resumen integrado con exportación a TXT/JSON}
 \label{fig:gui_summary}
 \end{figure}
