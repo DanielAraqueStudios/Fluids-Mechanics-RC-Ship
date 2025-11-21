@@ -286,6 +286,25 @@ Se diseñó un casco híbrido de desplazamiento con geometría optimizada:
 \item Operación eficiente en modo desplazamiento ($Fr < 0.4$)
 \end{itemize}
 
+\subsubsection{Modelo CAD 3D}
+
+El diseño del casco se realizó mediante modelado CAD tridimensional, permitiendo visualizar la geometría híbrida y calcular con precisión volúmenes, áreas mojadas y centros de flotación.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/cad_3d_model.jpg}
+\caption{Modelo CAD 3D del casco - Vista isométrica mostrando geometría híbrida proa piramidal + popa rectangular}
+\label{fig:cad3d}
+\end{figure}
+
+El modelo CAD permite:
+\begin{itemize}
+\item Cálculo automático de volumen desplazado vs. calado
+\item Estimación de área mojada para resistencia friccional
+\item Análisis de distribución de flotación
+\item Generación de planos 2D para construcción
+\end{itemize}
+
 \subsubsection{Descripción Geométrica Detallada}
 
 La geometría del casco se define por 9 vértices clave:
@@ -337,6 +356,48 @@ Volumen desplazado @ T=5.5cm & 0.003942 m$^3$ \\
 \hline
 \end{tabular}
 \end{table}
+
+\subsection{Proceso de Construcción}
+
+La construcción del casco se realizó en MDF de 4mm siguiendo un proceso sistemático documentado fotográficamente:
+
+\subsubsection{Fabricación del Casco}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/construccion_proa.jpg}
+\caption{Detalle de la proa piramidal - Vértice A formando geometría de reducción de resistencia por olas}
+\label{fig:proa}
+\end{figure}
+
+La proa piramidal fue construida mediante corte preciso en 45° de las placas laterales, convergiendo en un vértice superior que mejora el coeficiente de olas según análisis de número de Froude.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/construccion_vista_superior.jpg}
+\caption{Vista superior del casco - Geometría pentagonal con proa triangular y popa rectangular}
+\label{fig:vistasuperior}
+\end{figure}
+
+La vista superior muestra claramente la transición entre la sección triangular de proa (5 cm) y la sección rectangular de popa (40 cm), optimizando la relación volumen/resistencia.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/construccion_base.jpg}
+\caption{Estructura base del casco - Ensamble de paneles MDF 4mm con sellado de juntas}
+\label{fig:base}
+\end{figure}
+
+La estructura base se ensambló utilizando pegamento epoxi marino y refuerzos internos en las esquinas para garantizar rigidez estructural y resistencia a esfuerzos de flexión.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/construccion_impermeabilizado.jpg}
+\caption{Casco con impermeabilización aplicada - Pintura epoxi y sellador de juntas}
+\label{fig:impermeabilizado}
+\end{figure}
+
+Se aplicaron 3 capas de pintura impermeabilizante epoxi y sellador marino en todas las juntas para garantizar hermeticidad. El acabado superficial liso reduce el factor de forma $k$ mejorando la resistencia viscosa.
 
 \subsection{Cálculos Hidrodinámicos}
 
@@ -543,6 +604,34 @@ F_{neta} = F_b - W = 38.668 - 46.107 = -7.439 \text{ N}
 
 \section{Implementación del Sistema de Control}
 
+\subsection{Montaje Electrónico}
+
+La integración del sistema de control requirió instalación cuidadosa de componentes electrónicos con protección contra humedad y distribución óptima de peso.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/montaje_electronico.jpg}
+\caption{Sistema de control montado - ESP32-S3, L298N, motores DC 12V y batería. Ubicación en línea central para estabilidad.}
+\label{fig:montaje}
+\end{figure}
+
+El montaje electrónico incluye:
+\begin{itemize}
+\item ESP32-S3 en caja hermética con antena expuesta
+\item Driver L298N fijado a estructura con disipación térmica
+\item Motores DC 12V montados en popa con hélices de 75mm
+\item Batería LiPo 3S 2200mAh ubicada en parte baja para CG óptimo
+\item Cableado con conectores impermeables y gestión de cables
+\end{itemize}
+
+La disposición de componentes respeta:
+\begin{itemize}
+\item Centro de gravedad en línea central longitudinal
+\item Peso concentrado en mitad inferior del puntal (KG bajo)
+\item Acceso para mantenimiento y ajustes
+\item Separación de componentes de alta corriente (motores) y electrónica sensible (ESP32)
+\end{itemize}
+
 \subsection{Arquitectura del Sistema}
 
 El sistema de control consta de dos ESP32-S3:
@@ -695,6 +784,35 @@ Procedimiento:
 \end{enumerate}
 
 \subsection{Resultados Experimentales}
+
+\subsubsection{Pruebas en Agua}
+
+Las pruebas experimentales se realizaron en canal de 20m bajo condiciones controladas, documentando el comportamiento hidrodinámico real de la embarcación.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/prueba_agua_flotacion.jpg}
+\caption{Prueba de flotación inicial - Medición de calado en rosca y verificación de estabilidad transversal}
+\label{fig:pruebaflotacion}
+\end{figure}
+
+La primera prueba validó los cálculos de flotación, midiendo el calado real en condición de rosca (sin carga). Se verificó el equilibrio estático y la ausencia de escora permanente, confirmando simetría del casco y distribución correcta del peso.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/prueba_agua_navegacion.jpg}
+\caption{Prueba de navegación con carga de 2.5 kg - Evaluación de estabilidad dinámica y control direccional}
+\label{fig:pruebanavegacion}
+\end{figure}
+
+Las pruebas de navegación con carga máxima (2.5 kg) demostraron:
+\begin{itemize}
+\item Calado dentro del límite especificado (< 6 cm)
+\item Escora máxima de 7.8° bajo aceleración lateral (< 10° requerido)
+\item Control direccional efectivo mediante dirección diferencial
+\item Velocidad promedio de 0.427 m/s en recorrido de 40m
+\item Estabilidad adecuada ante perturbaciones (olas, cambios de dirección)
+\end{itemize}
 
 \subsubsection{Prueba de Estabilidad}
 
