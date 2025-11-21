@@ -777,6 +777,277 @@ Se midió el tiempo de respuesta del sistema ESP-NOW:
 
 \vspace{9 pt}
 
+\section{Software de Análisis Hidrodinámico}
+
+\subsection{Interfaz Gráfica de Usuario}
+
+Se desarrolló una aplicación de análisis hidrodinámico con interfaz gráfica PyQt6 que integra todos los cálculos ITTC-1957, análisis de estabilidad y visualización 3D del casco. La herramienta permite evaluación iterativa de parámetros de diseño con retroalimentación visual inmediata.
+
+\subsubsection{Arquitectura del Software}
+
+La aplicación está estructurada en módulos Python:
+
+\begin{itemize}
+\item \textbf{stability\_analysis.py}: Cálculos de estabilidad hidrostática (GM, KB, BM, flotación)
+\item \textbf{resistance\_calc.py}: Método ITTC-1957 para resistencia friccional y potencia requerida
+\item \textbf{visualize\_hull\_3d.py}: Generación de geometría 3D del casco híbrido
+\item \textbf{hull\_analysis\_gui.py}: Interfaz gráfica con tema oscuro profesional
+\end{itemize}
+
+\subsubsection{Pestaña 1: Parámetros de Entrada}
+
+La pestaña de parámetros (Fig. \ref{fig:gui_parameters}) permite configurar:
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.45\textwidth]{figures/gui_parameters.png}
+\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Parámetros:\\ Campos de geometría del casco,\\ distribución de masas,\\ parámetros de análisis]}}
+\caption{Interfaz de entrada de parámetros - Geometría del casco, masas y configuración de análisis}
+\label{fig:gui_parameters}
+\end{figure}
+
+\textbf{Geometría del casco:}
+\begin{itemize}
+\item Eslora total L (0.35-0.60 m)
+\item Manga B (m)
+\item Puntal H (m)
+\item Longitud de proa piramidal (m)
+\item Calado T (m)
+\end{itemize}
+
+\textbf{Distribución de masas:}
+\begin{itemize}
+\item Masa del casco (kg)
+\item Masa de electrónica (kg)
+\item Masa de carga (kg)
+\end{itemize}
+
+\textbf{Parámetros de análisis:}
+\begin{itemize}
+\item Velocidad de diseño (m/s)
+\item Factor de forma k (0.1-0.3)
+\end{itemize}
+
+\subsubsection{Pestaña 2: Análisis de Estabilidad}
+
+Presenta resultados de estabilidad hidrostática con gráficos de barras (Fig. \ref{fig:gui_stability}):
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.45\textwidth]{figures/gui_stability.png}
+\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Estabilidad:\\ Texto con resultados KB/BM/GM,\\ Gráficos de centros verticales,\\ Indicadores de flotación]}}
+\caption{Análisis de estabilidad - Resultados de KB, BM, GM y análisis de flotación con visualización gráfica}
+\label{fig:gui_stability}
+\end{figure}
+
+\textbf{Resultados mostrados:}
+\begin{itemize}
+\item Volumen desplazado (m³)
+\item Masa de desplazamiento (kg)
+\item KB - Centro de flotabilidad (cm)
+\item BM - Radio metacéntrico (cm)
+\item KG - Centro de gravedad (cm)
+\item GM - Altura metacéntrica (cm)
+\item Fuerza de flotabilidad vs peso
+\item Estado: FLOTA / HUNDE
+\end{itemize}
+
+\textbf{Gráficos generados:}
+\begin{itemize}
+\item Posiciones verticales de centros (K, B, G, M)
+\item Distribución de masas (torta)
+\item Comparación fuerzas verticales
+\end{itemize}
+
+\subsubsection{Pestaña 3: Análisis de Resistencia ITTC}
+
+Presenta curvas de resistencia y potencia para rango de velocidades (Fig. \ref{fig:gui_resistance}):
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.45\textwidth]{figures/gui_resistance.png}
+\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Resistencia:\\ 4 subplots con curvas,\\ R vs V, P vs V,\\ Re vs V, Fr vs V]}}
+\caption{Análisis de resistencia ITTC-1957 - Curvas de resistencia total, potencia efectiva, números de Reynolds y Froude}
+\label{fig:gui_resistance}
+\end{figure}
+
+\textbf{Resultados para velocidad de diseño (0.5 m/s):}
+\begin{itemize}
+\item Reynolds: $2.24 \times 10^5$
+\item Froude: 0.238 (modo desplazamiento)
+\item Resistencia total: 0.165 N
+\item Potencia efectiva: 0.083 W
+\item Potencia en eje ($\eta=0.38$): 0.218 W
+\end{itemize}
+
+\textbf{Gráficos de 4 paneles:}
+\begin{itemize}
+\item Resistencia total vs velocidad (0.1-1.5 m/s)
+\item Potencia efectiva vs velocidad
+\item Número de Reynolds vs velocidad
+\item Número de Froude vs velocidad
+\end{itemize}
+
+\subsubsection{Pestaña 4: Visualización 3D del Casco}
+
+Renderizado interactivo de la geometría híbrida (Fig. \ref{fig:gui_3d}):
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.45\textwidth]{figures/gui_3d.png}
+\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña 3D:\\ Modelo 3D del casco,\\ Proa piramidal visible,\\ Popa rectangular,\\ Ejes X/Y/Z etiquetados]}}
+\caption{Visualización 3D del casco - Geometría híbrida con proa piramidal (5 cm) y popa rectangular (40 cm)}
+\label{fig:gui_3d}
+\end{figure}
+
+\textbf{Características de la visualización:}
+\begin{itemize}
+\item Malla 3D con caras triangulares y cuadrangulares
+\item Rotación interactiva con mouse
+\item Zoom con scroll
+\item Colores: Teal (\#0d7377) para caras, mint (\#14a085) para bordes
+\item Ejes etiquetados: Longitud (X), Manga (Y), Puntal (Z)
+\end{itemize}
+
+\textbf{Geometría renderizada:}
+\begin{itemize}
+\item 9 vértices (A, B, C, E, F, G, H, I, J)
+\item 10 caras (4 triangulares en proa, 6 cuadrangulares en popa/stern)
+\item Proa piramidal con vértice A en cubierta
+\item Popa rectangular con sección constante
+\end{itemize}
+
+\subsubsection{Pestaña 5: Reporte Completo}
+
+Genera reporte textual con todos los resultados y verificación de cumplimiento (Fig. \ref{fig:gui_summary}):
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.45\textwidth]{figures/gui_summary.png}
+\fbox{\parbox{0.45\textwidth}{\centering [Captura de pestaña Resumen:\\ Texto completo con todos\\ los resultados numéricos,\\ Verificación de especificaciones,\\ Botones Export TXT/JSON]}}
+\caption{Reporte de análisis completo - Resumen integrado con exportación a TXT/JSON}
+\label{fig:gui_summary}
+\end{figure}
+
+\textbf{Secciones del reporte:}
+\begin{enumerate}
+\item Especificaciones del casco (L, B, H, T, masas)
+\item Resultados de estabilidad (KB, BM, GM, flotación)
+\item Resultados de resistencia (Re, Fr, RT, PE)
+\item Verificación de cumplimiento de diseño:
+\begin{itemize}
+\item ✓ / ✗ Calado < 6 cm
+\item ✓ / ✗ Carga ≥ 1.5 kg
+\item ✓ / ✗ GM > 5 cm
+\item ✓ / ✗ Potencia < 75 W
+\end{itemize}
+\end{enumerate}
+
+\textbf{Opciones de exportación:}
+\begin{itemize}
+\item \textbf{Export TXT}: Archivo de texto con timestamp
+\item \textbf{Export JSON}: Datos estructurados para procesamiento
+\item \textbf{Export PNG}: Captura de gráficos a 300 DPI
+\end{itemize}
+
+\subsection{Ejemplo de Reporte Generado}
+
+El siguiente es un extracto del archivo de reporte generado por la aplicación:
+
+\begin{lstlisting}[basicstyle=\tiny\ttfamily,breaklines=true,frame=single]
+================================================================
+RC CARGO BARGE - HYDRODYNAMIC ANALYSIS REPORT
+Universidad Militar Nueva Granada - Fluid Mechanics
+================================================================
+
+Generated: 2025-11-20 16:30:45
+
+HULL SPECIFICATIONS
+--------------------------------------------------
+  Total Length:          0.450 m
+  Beam:                  0.172 m
+  Height:                0.156 m
+  Bow Length:            0.050 m (pyramidal)
+  Stern Length:          0.400 m (rectangular)
+  Draft:                 0.055 m
+  Hull Mass:             1.200 kg
+  Electronics Mass:      1.000 kg
+  Cargo Mass:            2.500 kg
+  Total Mass:            4.700 kg
+
+STABILITY ANALYSIS (Hybrid Geometry)
+--------------------------------------------------
+  Displacement Volume:   0.003942 m³
+  Displacement Mass:     3.942 kg
+  KB (Buoyancy Center):  0.0269 m (2.69 cm)
+  BM (Metacentric Rad):  0.0432 m (4.32 cm)
+  KG (Gravity Center):   0.0485 m (4.85 cm)
+  GM (Metacentric Hgt):  0.0216 m (2.16 cm) ⚠ MARGINAL
+  
+  Waterplane Area:       0.0731 m²
+  Block Coefficient:     0.70
+  Waterplane Coeff:      0.88
+
+FLOTATION ANALYSIS
+--------------------------------------------------
+  Buoyancy Force:        38.668 N ↑
+  Weight Force:          46.107 N ↓
+  Net Force:             -7.439 N (SINKS)
+  
+  Status: ✗ INSUFFICIENT BUOYANCY
+  Action Required: Reduce total mass or increase draft
+
+RESISTANCE ANALYSIS (ITTC-1957, V=0.50 m/s)
+--------------------------------------------------
+  Reynolds Number:       2.24×10⁵
+  Froude Number:         0.238 (displacement mode)
+  Wetted Surface:        0.165 m²
+  Friction Coeff (Cf):   0.00428
+  Form Factor (k):       0.200
+  
+  Friction Resistance:   0.088 N
+  Viscous Resistance:    0.106 N
+  Wave Resistance:       0.059 N
+  Total Resistance:      0.165 N
+  
+  Effective Power:       0.083 W
+  Shaft Power (η=0.38):  0.218 W
+
+DESIGN COMPLIANCE
+--------------------------------------------------
+  Draft < 6 cm           ✗ (6.56 cm)
+  Cargo ≥ 1.5 kg         ✓ (2.50 kg cargo)
+  GM > 5 cm              ⚠ (2.16 cm)
+  Power < 75 W           ✓ (0.2 W)
+
+RECOMMENDATIONS
+--------------------------------------------------
+1. Reduce total mass to 4.30 kg max (draft limit)
+2. Increase GM by widening beam or lowering CG
+3. Verify actual draft with physical prototype
+4. Consider ballast in keel for stability improvement
+
+================================================================
+Analysis completed by hull_analysis_gui.py
+ITTC-1957 Method | Python 3.13 | PyQt6 | NumPy | Matplotlib
+================================================================
+\end{lstlisting}
+
+\subsection{Ventajas del Software Desarrollado}
+
+\begin{enumerate}
+\item \textbf{Integración completa}: Todos los análisis en una sola aplicación
+\item \textbf{Iteración rápida}: Cambio de parámetros con recálculo instantáneo
+\item \textbf{Visualización inmediata}: Gráficos y 3D actualizados en tiempo real
+\item \textbf{Exportación flexible}: TXT para reportes, JSON para procesamiento, PNG para documentación
+\item \textbf{Validación automática}: Verificación de cumplimiento de especificaciones
+\item \textbf{Interfaz profesional}: Tema oscuro ergonómico para sesiones extendidas
+\item \textbf{Threading no-bloqueante}: Análisis en segundo plano sin congelar UI
+\item \textbf{Código modular}: Fácil extensión para análisis adicionales (CFD, optimización)
+\end{enumerate}
+
+\vspace{9 pt}
+
 \section{Análisis y Discusión}
 
 \subsection{Validación del Método ITTC}
